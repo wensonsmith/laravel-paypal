@@ -45,11 +45,7 @@ trait PayPalAPI
 
         $response = $this->doPayPalRequest();
 
-        if (isset($response['access_token'])) {
-            $this->setAccessToken($response);
-
-            $this->setPayPalAppId($response);
-        }
+        $this->setAccessToken($response);
 
         return $response;
     }
@@ -57,15 +53,19 @@ trait PayPalAPI
     /**
      * Set PayPal Rest API access token.
      *
-     * @param array $response
+     * @param  array  $response
      *
      * @return void
      */
-    public function setAccessToken($response)
+    public function setAccessToken(array $response)
     {
-        $this->access_token = $response['access_token'];
+        if (isset($response['access_token'])) {
+            $this->access_token = $response['access_token'];
 
-        $this->options['headers']['Authorization'] = "{$response['token_type']} {$this->access_token}";
+            $this->options['headers']['Authorization'] = "{$response['token_type']} {$this->access_token}";
+
+            $this->setPayPalAppId($response);
+        }
     }
 
     /**
