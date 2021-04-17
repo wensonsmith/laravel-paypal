@@ -24,12 +24,6 @@ class PayPal
         }
 
         $this->httpBodyParam = 'form_params';
-
-        $this->options = [];
-        $this->options['headers'] = [
-            'Accept'            => 'application/json',
-            'Accept-Language'   => $this->locale,
-        ];
     }
 
     /**
@@ -58,5 +52,13 @@ class PayPal
         $this->config['payment_action'] = $credentials['payment_action'];
         $this->config['notify_url'] = $credentials['notify_url'];
         $this->config['locale'] = $credentials['locale'];
+
+        // Set request headers
+        $this->options = [];
+        $this->options['headers'] = [
+            'Accept'            => 'application/json',
+            'Accept-Language'   => $this->locale,
+            'PayPal-Partner-Attribution-Id' => $this->config['paypal_partner_attribution_id']
+        ];
     }
 }

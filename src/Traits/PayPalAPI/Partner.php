@@ -7,15 +7,14 @@ trait Partner
     /**
      * Set partner require header parameters
      *
-     * @param string $merchantId
+     * @param  string  $merchantId
      *
      * @see https://developer.paypal.com/docs/api/reference/api-requests/#paypal-auth-assertion
      */
-    public function authAssertion(string $merchantId)
+    public function actingAs(string $merchantId)
     {
-        $str = '{"iss" : "' . $this->config['client_id'] . '","payer_id":"' . $merchantId . '"}';
-        $this->options['headers']['PayPal-Auth-Assertion'] = base64_encode('{"alg":"none"}') . "." . base64_encode($str) . ".";
-        $this->options['headers']['PayPal-Partner-Attribution-Id'] = $this->config['paypal_partner_attribution_id'];
+        $assertion = '{"iss" : "'.$this->config['client_id'].'","payer_id":"'.$merchantId.'"}';
+        $this->options['headers']['PayPal-Auth-Assertion'] = base64_encode('{"alg":"none"}').".".base64_encode($assertion).".";
     }
 
 
