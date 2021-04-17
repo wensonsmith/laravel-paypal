@@ -1,12 +1,8 @@
 # Laravel PayPal
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/srmklive/paypal.svg?style=flat-square)](https://packagist.org/packages/srmklive/paypal)
-[![Total Downloads](https://img.shields.io/packagist/dt/srmklive/paypal.svg?style=flat-square)](https://packagist.org/packages/srmklive/paypal)
-[![StyleCI](https://github.styleci.io/repos/43671533/shield?branch=v2.0)](https://github.styleci.io/repos/43671533?branch=v2.0)
-![Tests](https://github.com/srmklive/laravel-paypal/workflows/TestsV3/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/srmklive/laravel-paypal/badge.svg?branch=v3.0)](https://coveralls.io/github/srmklive/laravel-paypal?branch=v3.0)
-[![Code Quality](https://scrutinizer-ci.com/g/srmklive/laravel-paypal/badges/quality-score.png?b=v3.0)](https://scrutinizer-ci.com/g/srmklive/laravel-paypal/?branch=v3.0)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/wenson/paypal.svg?style=flat-square)](https://packagist.org/packages/wenson/paypal)
+[![Total Downloads](https://img.shields.io/packagist/dt/wenson/paypal.svg?style=flat-square)](https://packagist.org/packages/wenson/paypal)
 
 - [Introduction](#introduction)
 - [PayPal API Credentials](#paypal-api-credentials)
@@ -15,11 +11,10 @@
 - [Usage](#usage)
 - [Support](#support)
 
-    
 <a name="introduction"></a>
 ## Introduction
 
-By using this plugin you can process or refund payments and handle IPN (Instant Payment Notification) from PayPal in your Laravel application.
+This package is build on `srmklive/paypal` package with Partner api support
 
 **This plugin supports the new paypal rest api.**
 
@@ -38,14 +33,9 @@ https://developer.paypal.com/docs/api/overview/
 If you intend to use ExpressCheckout, please to the following [README](https://github.com/srmklive/laravel-paypal/tree/v1.0). *v2.0* & *v3.0* uses the new rest api.
 
 ```bash
-composer require srmklive/paypal:~3.0
+composer require wenson/paypal
 ```
 
-To use this package for Laravel 5.1 to 5.8 use the following commands
-
-```bash
-composer require srmklive/paypal:~2.0
-```
 * Run the following command to publish configuration:
 
 ```bash
@@ -122,7 +112,13 @@ $provider->setApiCredentials($config);
 After setting the PayPal API configuration by calling `setApiCredentials` method. You need to get access token before performing any API calls
 
 ```php
-$provider->getAccessToken();
+if (Cache::get('token')) {
+    $provider->setAccessToken(Cache::get('token'));
+} else {
+    $response = $provider->getAccessToken();
+    Cache::set('token', $response);
+}
+
 ```
 
 
@@ -157,6 +153,18 @@ so you can direct the user to Paypal to complete the order with their payment de
 When the user returns to the notifcation url you can capture the order payment with
 ```php
 $provider->capturePaymentOrder($order_id); //order id from the createOrder step 
+```
+
+## Partner
+
+```php
+$provider = new Paypal();
+
+// behalf of merchant
+$provider->actingAs($merchantId);
+
+// partner referrals
+$provider->partnerReferrals($trackingId);
 ```
 
 <a name="support"></a>
