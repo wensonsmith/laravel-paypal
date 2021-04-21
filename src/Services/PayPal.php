@@ -52,6 +52,7 @@ class PayPal
         $this->config['payment_action'] = $credentials['payment_action'];
         $this->config['notify_url'] = $credentials['notify_url'];
         $this->config['locale'] = $credentials['locale'];
+        $this->config['partner_id'] = $credentials['partner_id'];
 
         // Set request headers
         $this->options = [];
