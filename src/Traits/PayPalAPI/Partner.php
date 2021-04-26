@@ -47,7 +47,7 @@ trait Partner
      */
     public function merchantStatus(string $merchantId)
     {
-        $this->apiEndPoint = "/v1/customer/partners/{$this->config['partner_id']}/merchantintegrations/${merchantId}";
+        $this->apiEndPoint = "v1/customer/partners/{$this->config['partner_id']}/merchantintegrations/${merchantId}";
         $this->apiUrl = collect([$this->config['api_url'], $this->apiEndPoint])->implode('/');
 
         $this->verb = 'get';

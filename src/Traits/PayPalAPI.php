@@ -22,6 +22,7 @@ trait PayPalAPI
     use PayPalAPI\WebHooksVerification;
     use PayPalAPI\WebHooksEvents;
     use PayPalAPI\Partner;
+    use PayPalAPI\Identity;
 
     /**
      * Login through PayPal API to get access token.
