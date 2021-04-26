@@ -87,10 +87,10 @@ trait PayPalHttpClient
     protected function setCurlConstants()
     {
         $constants = [
-            'CURLOPT_SSLVERSION'        => 32,
-            'CURL_SSLVERSION_TLSv1_2'   => 6,
-            'CURLOPT_SSL_VERIFYPEER'    => 64,
-            'CURLOPT_SSLCERT'           => 10025,
+            'CURLOPT_SSLVERSION' => 32,
+            'CURL_SSLVERSION_TLSv1_2' => 6,
+            'CURLOPT_SSL_VERIFYPEER' => 64,
+            'CURLOPT_SSLCERT' => 10025,
         ];
 
         foreach ($constants as $key => $value) {
@@ -103,7 +103,7 @@ trait PayPalHttpClient
     /**
      * Function to initialize/override Http Client.
      *
-     * @param \GuzzleHttp\Client|null $client
+     * @param  \GuzzleHttp\Client|null  $client
      *
      * @return void
      */
@@ -130,7 +130,7 @@ trait PayPalHttpClient
         $this->setCurlConstants();
 
         $this->httpClientConfig = [
-            CURLOPT_SSLVERSION     => CURL_SSLVERSION_TLSv1_2,
+            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
             CURLOPT_SSL_VERIFYPEER => $this->validateSSL,
         ];
 
@@ -164,9 +164,9 @@ trait PayPalHttpClient
     /**
      * Perform PayPal API request & return response.
      *
+     * @return StreamInterface
      * @throws \Throwable
      *
-     * @return StreamInterface
      */
     private function makeHttpRequest()
     {
@@ -175,19 +175,19 @@ trait PayPalHttpClient
                 $this->apiUrl,
                 $this->options
             )->getBody();
-        } catch (HttpClientException $e) {
-            throw new RuntimeException($e->getRequest()->getBody().' '.$e->getResponse()->getBody());
+        } catch (HttpClientException $exception) {
+            throw new RuntimeException($exception->getResponse()->getBody(), $exception->getCode());
         }
     }
 
     /**
      * Function To Perform PayPal API Request.
      *
-     * @param bool $decode
-     *
-     * @throws \Throwable
+     * @param  bool  $decode
      *
      * @return array|StreamInterface|string
+     * @throws \Throwable
+     *
      */
     private function doPayPalRequest($decode = true)
     {
@@ -196,13 +196,15 @@ trait PayPalHttpClient
             $response = $this->makeHttpRequest();
 
             return ($decode === false) ? $response->getContents() : \GuzzleHttp\json_decode($response, true);
-        } catch (RuntimeException $t) {
-            $messages = \GuzzleHttp\json_decode('['.str_replace('} {', '},{', $t->getMessage()).']', true);
+        } catch (RuntimeException $exception) {
+            $code = $exception->getCode();
+            $message = \GuzzleHttp\Utils::jsonDecode($exception->getMessage(), true);
         }
 
         return [
-            'type'    => 'error',
-            'message' => $messages,
+            'type' => 'error',
+            'code' => $code,
+            'message' => $message,
         ];
     }
 }

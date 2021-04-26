@@ -26,21 +26,55 @@ trait PayPalAPI
     /**
      * Login through PayPal API to get access token.
      *
-     * @throws \Throwable
-     *
+     * @param  srting|null  $code
      * @return array|\Psr\Http\Message\StreamInterface|string
+     *
+     * @throws \Throwable
      *
      * @see https://developer.paypal.com/docs/api/get-an-access-token-curl/
      * @see https://developer.paypal.com/docs/api/get-an-access-token-postman/
      */
-    public function getAccessToken()
+    public function getAccessToken($code = null)
     {
         $this->apiEndPoint = 'v1/oauth2/token';
         $this->apiUrl = collect([$this->config['api_url'], $this->apiEndPoint])->implode('/');
 
         $this->options['auth'] = [$this->config['client_id'], $this->config['client_secret']];
+
+        if ($code !== null) {
+            $this->options[$this->httpBodyParam] = [
+                'grant_type' => 'authorization_code',
+                'code' => $code
+            ];
+        } else {
+            $this->options[$this->httpBodyParam] = [
+                'grant_type' => 'client_credentials',
+            ];
+        }
+
+        $response = $this->doPayPalRequest();
+
+        $this->setAccessToken($response);
+
+        return $response;
+    }
+
+    /**
+     * Refresh access token by refresh token
+     *
+     * @param $refreshToken
+     * @return array|\Psr\Http\Message\StreamInterface|string
+     */
+    public function refreshAccessToken(string $refreshToken)
+    {
+        $this->apiEndPoint = 'v1/oauth2/token';
+        $this->apiUrl = collect([$this->config['api_url'], $this->apiEndPoint])->implode('/');
+
+        $this->options['auth'] = [$this->config['client_id'], $this->config['client_secret']];
+
         $this->options[$this->httpBodyParam] = [
-            'grant_type' => 'client_credentials',
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken
         ];
 
         $response = $this->doPayPalRequest();
@@ -71,13 +105,13 @@ trait PayPalAPI
     /**
      * Set PayPal App ID.
      *
-     * @param array $response
+     * @param  array  $response
      *
      * @return void
      */
     private function setPayPalAppId($response)
     {
-        if (empty($this->config['app_id'])) {
+        if (empty($this->config['app_id']) && isset($response['app_id'])) {
             $this->config['app_id'] = $response['app_id'];
         }
     }
