@@ -97,6 +97,7 @@ trait PayPalAPI
         if (isset($response['access_token'])) {
             $this->access_token = $response['access_token'];
 
+            $this->options['auth'] = [];
             $this->options['headers']['Authorization'] = "{$response['token_type']} {$this->access_token}";
 
             $this->setPayPalAppId($response);
